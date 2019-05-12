@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+        <widget.button.progress.LoadingButton
+                android:id="@+id/btnLoading"
+                android:layout_margin="16dp"
+                android:onClick="onClick"
+                android:text="Create"
+                android:textAllCaps="false"
+                android:padding="16dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                app:colorBackgroundLoading="@color/main_color_disabled"
+                app:colorBackground="@color/main_color"
+                app:colorProgressBar="@color/main_color"
+                app:colorProgressBackground="@color/gray_ddd"
+                app:progressDuration="500"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+    <Button
+            android:id="@+id/btnStop"
+            android:onClick="onClick"
+            android:background="#f00"
+            android:text="stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+</LinearLayout>
