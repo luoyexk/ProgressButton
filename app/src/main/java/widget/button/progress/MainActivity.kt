@@ -14,21 +14,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-//        valueAnimator()
-    }
-
-    private fun valueAnimator(){
-        val valueAnimator = ValueAnimator.ofInt(100)
-        valueAnimator.duration = 2000
-        valueAnimator.repeatCount = ValueAnimator.INFINITE
-        valueAnimator.repeatMode = ValueAnimator.RESTART
-        valueAnimator.setInterpolator(LinearInterpolator())
-        valueAnimator.addUpdateListener { animation ->
-            Log.e("tag", animation?.animatedValue.toString())
-        }
-        valueAnimator.start()
-
     }
 
     fun onClick(view: View) {

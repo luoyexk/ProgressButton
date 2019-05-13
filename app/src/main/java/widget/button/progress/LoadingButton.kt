@@ -1,16 +1,11 @@
 package widget.button.progress
 
 import android.animation.Animator
-import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
-import android.util.AttributeSet
-import android.util.Log
-import android.view.animation.AlphaAnimation
-import android.view.animation.LinearInterpolator
-import android.widget.Button
-import android.animation.ObjectAnimator
 import android.graphics.*
+import android.util.AttributeSet
+import android.view.animation.LinearInterpolator
 import android.widget.TextView
 
 
@@ -27,9 +22,10 @@ class LoadingButton @JvmOverloads constructor(
     private var colorBgDefault = Color.WHITE
     private var colorProgressBar = Color.GRAY
     private var colorProgressBackground = Color.WHITE
-    private var progressHeight = 16f
+    private var progressHeight = 8f
     private var progressWidth = 400f
     private var progressDuration = 1000L
+    private var corners = 10f
 
     private var mPaint = Paint()
     private var startX = 0f
@@ -45,7 +41,7 @@ class LoadingButton @JvmOverloads constructor(
             val value = animation?.animatedValue as? Int ?: return
             startX = value.toFloat()
             endX = startX - progressWidth
-            Log.e("tag", "$value startX$startX  endX$endX")
+            endY = progressHeight
             invalidate()
         }
     }
@@ -57,7 +53,6 @@ class LoadingButton @JvmOverloads constructor(
         override fun onAnimationEnd(animation: Animator?) {
             isEnabled = true
             drawProgressBg = false
-            normalBackground()
         }
 
         override fun onAnimationCancel(animation: Animator?) {
@@ -72,10 +67,7 @@ class LoadingButton @JvmOverloads constructor(
         mPaint.color = colorProgressBar
         mPaint.strokeCap = Paint.Cap.ROUND
         mPaint.isAntiAlias = true
-        PorterDuffXfermode(PorterDuff.Mode.SRC)
         porterDuff = PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP)
-
-        normalBackground()
     }
 
     private fun initAttrs(attrs: AttributeSet?) {
@@ -86,19 +78,22 @@ class LoadingButton @JvmOverloads constructor(
         colorProgressBar = array.getColor(R.styleable.LoadingButton_colorProgressBar, colorProgressBar)
         colorProgressBackground =
             array.getColor(R.styleable.LoadingButton_colorProgressBackground, colorProgressBackground)
-//        progressHeight = array.getDimension(R.styleable.LoadingButton_progressHeight, progressHeight)
-//        progressWidth = array.getDimension(R.styleable.LoadingButton_progressWidth, progressWidth)
+        progressHeight = array.getDimension(R.styleable.LoadingButton_progressHeight, progressHeight)
+        // todo 暂时不支持动态设置进度条的长2019-05-12 现在是控件长度的一般，width/2
+        progressWidth = array.getDimension(R.styleable.LoadingButton_progressWidth, progressWidth)
         progressDuration =
             array.getInteger(R.styleable.LoadingButton_progressDuration, progressDuration.toInt()).toLong()
-
-
+        corners = array.getDimension(R.styleable.LoadingButton_corners, corners)
         array.recycle()
     }
 
     fun showLoading() {
+        isEnabled = false
+        drawProgressBg = true
         val anim = valueAnimator
         val width = width
-        progressWidth = (width / 3).toFloat()
+        // 设置进度条的长度
+        progressWidth = (width / 2).toFloat()
         val max = width + progressWidth
         anim.setIntValues(max.toInt())
         anim.duration = progressDuration
@@ -108,14 +103,22 @@ class LoadingButton @JvmOverloads constructor(
         anim.removeUpdateListener(showListener)
         anim.addUpdateListener(showListener)
         anim.start()
-        isEnabled = false
     }
 
     fun stopLoading() {
         val anim = valueAnimator
-        anim.repeatCount = 1
         anim.removeListener(lifeListener)
         anim.addListener(lifeListener)
+        // 这里通过总播放时间除以单次播放时间得到播放次数，在"停止loading"时，为了看到完整的从左到右的进度条，使其播放次数为已经播放的次数
+        val currentPlayTime = anim.currentPlayTime
+        val playTime = currentPlayTime.toDouble()
+        val duration = anim.duration
+        if (duration == 0L) {
+            anim.repeatCount = 1
+            return
+        }
+        val playedCount = Math.ceil(playTime / duration)
+        anim.repeatCount = playedCount.toInt()
     }
 
     override fun onDetachedFromWindow() {
@@ -128,7 +131,7 @@ class LoadingButton @JvmOverloads constructor(
         canvas ?: return
         val sc = canvas.saveLayer(0f, 0f, width.toFloat(), height.toFloat(), null)
         mPaint.color = if (drawProgressBg) colorBgLoading else colorBgDefault
-        canvas.drawRoundRect(0f, 0f, width.toFloat(), height.toFloat(), 30f, 30f, mPaint)
+        canvas.drawRoundRect(0f, 0f, width.toFloat(), height.toFloat(), corners, corners, mPaint)
         if (drawProgressBg) {
             mPaint.xfermode = porterDuff
             mPaint.color = colorProgressBackground
@@ -143,14 +146,6 @@ class LoadingButton @JvmOverloads constructor(
         // 还原画布
         canvas.restoreToCount(sc)
         super.onDraw(canvas)
-    }
-
-    override fun setEnabled(enabled: Boolean) {
-        super.setEnabled(enabled)
-        if (!enabled) {
-            loadingBackground()
-            drawProgressBg = true
-        }
     }
 
     /**

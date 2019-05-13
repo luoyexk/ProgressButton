@@ -9,12 +9,21 @@
     </style>
     
     <declare-styleable name="LoadingButton">
+        <!--载入中button的背景颜色-->
         <attr name="colorBackgroundLoading" format="color"/>
+        <!--默认状态button的背景色-->
         <attr name="colorBackground" format="color"/>
+        <!--进度条的颜色-->
         <attr name="colorProgressBar" format="color"/>
+        <!--进度条的背景色-->
         <attr name="colorProgressBackground" format="color"/>
+        <!--进度条的高度-->
         <attr name="progressHeight" format="dimension"/>
+        <!--进度条的宽度-->
         <attr name="progressWidth" format="dimension"/>
+        <!--进度条走一轮需要的时间-->
         <attr name="progressDuration" format="integer"/>
+        <!--button圆角设置-->
+        <attr name="corners" format="dimension"/>
     </declare-styleable>
 </resources>

@@ -20,7 +20,9 @@
                 app:colorBackground="@color/main_color"
                 app:colorProgressBar="@color/main_color"
                 app:colorProgressBackground="@color/gray_ddd"
-                app:progressDuration="500"
+                app:progressDuration="1000"
+                app:corners="5dp"
+                app:progressHeight="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
