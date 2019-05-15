@@ -68,6 +68,7 @@ class LoadingButton @JvmOverloads constructor(
         mPaint.strokeCap = Paint.Cap.ROUND
         mPaint.isAntiAlias = true
         porterDuff = PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP)
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
     private fun initAttrs(attrs: AttributeSet?) {
@@ -129,20 +130,26 @@ class LoadingButton @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas?) {
         canvas ?: return
-        val sc = canvas.saveLayer(0f, 0f, width.toFloat(), height.toFloat(), null)
-        mPaint.color = if (drawProgressBg) colorBgLoading else colorBgDefault
-        canvas.drawRoundRect(0f, 0f, width.toFloat(), height.toFloat(), corners, corners, mPaint)
-        if (drawProgressBg) {
-            mPaint.xfermode = porterDuff
-            mPaint.color = colorProgressBackground
-            canvas.drawRect(0f, startY, width.toFloat(), endY, mPaint)
+        val paint = mPaint
+        val myWidth = width.toFloat()
+        val myHeight = height.toFloat()
 
-            mPaint.color = colorProgressBar
-            canvas.drawRect(startX, startY, endX, endY, mPaint)
+        val sc = canvas.saveLayer(0f, 0f, myWidth, myHeight, null)
+        paint.color = if (drawProgressBg) colorBgLoading else colorBgDefault
+        // 绘制直角底部
+        canvas.drawRect(0f, (height - corners), myWidth, myHeight, paint)
+        canvas.drawRoundRect(0f, 0f, myWidth, myHeight, corners, corners, paint)
+        if (drawProgressBg) {
+            paint.xfermode = porterDuff
+            paint.color = colorProgressBackground
+            canvas.drawRect(0f, startY, myWidth, endY, paint)
+
+            paint.color = colorProgressBar
+            canvas.drawRect(startX, startY, endX, endY, paint)
         }
 
         // 还原混合模式
-        mPaint.xfermode = null
+        paint.xfermode = null
         // 还原画布
         canvas.restoreToCount(sc)
         super.onDraw(canvas)
